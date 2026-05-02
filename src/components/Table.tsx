@@ -22,9 +22,9 @@ const Table = ({ records }: TableProps) => {
                 <tbody>
                     {records.map(record => (
                         <>
-                            <tr className='text-sm font-semibold bg-green-200' key={record.id}>
+                            <tr className='text-sm font-semibold bg-green-100' key={record.id}>
                                 <td className='text-center md:w-1/2 py-1.5'>{record.site}</td>
-                                <td className='text-center py-3 border-x md:border-0'>{record.userName}</td>
+                                <td className='text-center py-3 border-x md:border-0'>{record.username}</td>
                                 <td className='text-center py-3 border-x md:border-0'>{record.password}</td>
                                 <td className='py-3'>
                                     <div className="flex text-2xl gap-2 justify-center">

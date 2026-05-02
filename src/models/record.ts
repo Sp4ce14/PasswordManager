@@ -1,6 +1,6 @@
 export default interface Record {
     id: string;
     site: string;
-    userName: string;
+    username: string;
     password: string;
 }
