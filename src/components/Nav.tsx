@@ -1,6 +1,7 @@
+import type React from "react";
 import { FaGithub } from "react-icons/fa";
 
-const Nav = () => {
+const Nav: React.FC = () => {
   return (
     <div className="bg-slate-800 display flex m-0 p-1.5 justify-between md:justify-around items-center">
         <div className="flex text-2xl font-bold">

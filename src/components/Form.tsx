@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BiSolidShow } from "react-icons/bi";
 import { FaRegSave } from "react-icons/fa";
@@ -11,13 +11,17 @@ interface RecordForm {
 }
 
 interface FormProps {
-  setRecords: React.Dispatch<React.SetStateAction<Record[]>>
+  setRecords: React.Dispatch<React.SetStateAction<Record[]>>;
+  records: Record[];
+  toEditId: string | null;
 }
 
-const Form = ({setRecords}: FormProps) => {
+const Form: React.FC<FormProps> = ({ setRecords, records, toEditId }: FormProps) => {
   const [show, setShow] = useState<boolean>(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<RecordForm>();
   const urlRegex: RegExp = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/;
+
+  // add record logic
   const onSubmit = (formData: RecordForm) => {
     setRecords(prev => [...prev, {
       id: crypto.randomUUID(),
@@ -27,6 +31,12 @@ const Form = ({setRecords}: FormProps) => {
     }]);
     reset();
   }
+
+  // prefill form logic on edit press
+  useEffect(() => {
+    
+  }, [toEditId])
+  
 
   return (
     <>
