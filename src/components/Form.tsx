@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BiSolidShow } from "react-icons/bi";
 import { FaRegSave } from "react-icons/fa";
+import { MdCancel } from "react-icons/md";
+import { RxUpdate } from "react-icons/rx";
 import type Record from '../models/record.ts'
 
 interface RecordForm {
@@ -12,30 +14,58 @@ interface RecordForm {
 
 interface FormProps {
   setRecords: React.Dispatch<React.SetStateAction<Record[]>>;
+  setEditPressed: React.Dispatch<React.SetStateAction<boolean>>;
   records: Record[];
+  editPressed: boolean;
   toEditId: string | null;
 }
 
-const Form: React.FC<FormProps> = ({ setRecords, records, toEditId }: FormProps) => {
+const Form: React.FC<FormProps> = ({ setRecords, records, toEditId, editPressed, setEditPressed }: FormProps) => {
   const [show, setShow] = useState<boolean>(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<RecordForm>();
   const urlRegex: RegExp = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/;
 
-  // add record logic
+  // submit logic
   const onSubmit = (formData: RecordForm) => {
-    setRecords(prev => [...prev, {
+    // add logic
+    if (!editPressed) {
+      setRecords(prev => [...prev, {
       id: crypto.randomUUID(),
       site: formData.site,
       username: formData.username,
       password: formData.password
     }]);
-    reset();
+    // update logic
+    } else {
+      let recordToEdit: Record = records.filter(record => record.id === toEditId)[0]
+      if (!recordToEdit){
+        alert('The record you are trying to edit has been deleted');
+      } else {
+        setRecords(prev => {
+        return prev.map(record => record.id === toEditId ? {...record, ...formData}: record);
+      })}
+      setEditPressed(false);
+    }
+    reset({
+        site: '',
+        username: '',
+        password: ''
+      });
   }
 
   // prefill form logic on edit press
   useEffect(() => {
-    
-  }, [toEditId])
+    // set if condition to escape the initial render and value initialization
+    if (editPressed) {
+      let prefillRecord: Record = records.filter(record => record.id == toEditId)[0];
+      console.log(prefillRecord, toEditId)
+      reset({
+        site: prefillRecord.site,
+        username: prefillRecord.username,
+        password: prefillRecord.password
+      })
+    }
+  }, [toEditId, editPressed])
   
 
   return (
@@ -62,10 +92,21 @@ const Form: React.FC<FormProps> = ({ setRecords, records, toEditId }: FormProps)
             <div className="h-5 ml-3 text-sm text-red-600">{errors.password?.message}</div>
           </div>
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-x-3">
+          {editPressed && (
+            <button type="submit" className="mt-2 bg-red-100 border-red-300 border rounded-3xl py-2 px-4 font-semibold hover:opacity-90 cursor-pointer" onClick={() => { setEditPressed(false); reset({
+        site: '',
+        username: '',
+        password: ''
+      }) }}>
+            <div className="flex gap-2 items-center">
+              <div className="text-[25px]"><MdCancel /></div> <div className="text-sm">Cancel</div>
+            </div>
+          </button>
+          )}
           <button type="submit" className="mt-2 bg-green-400 border-green-600 border rounded-3xl py-2 px-6 font-semibold hover:opacity-90 cursor-pointer">
             <div className="flex gap-2 items-center">
-              <div className="text-[25px]"><FaRegSave /></div> <div className="text-sm">Save</div>
+              {editPressed ? (<><div className="text-[25px]"> <RxUpdate /></div> <div className="text-sm">Update</div></>) : (<><div className="text-[25px]"> <FaRegSave /></div> <div className="text-sm">Save</div></>)}
             </div>
           </button>
         </div>

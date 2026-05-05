@@ -6,10 +6,10 @@ import type React from "react";
 interface TableProps {
     records: Record[];
     setRecords: React.Dispatch<React.SetStateAction<Record[]>>;
-    toggleEdit(id: string): void
+    triggerEdit(id: string): void
 }
 
-const Table: React.FC<TableProps> = ({ records, setRecords, toggleEdit }: TableProps) => {
+const Table: React.FC<TableProps> = ({ records, setRecords, triggerEdit }: TableProps) => {
 
     // delete logic
     const handleDelete = (id: string): void => {
@@ -37,7 +37,7 @@ const Table: React.FC<TableProps> = ({ records, setRecords, toggleEdit }: TableP
                                 <td className='text-center py-3 border-x md:border-0'>{record.password}</td>
                                 <td className='py-3'>
                                     <div className="flex text-2xl gap-2 justify-center">
-                                        <button onClick={() => toggleEdit(record.id)} className='hover:opacity-80 cursor-pointer'>
+                                        <button onClick={() => triggerEdit(record.id)} className='hover:opacity-80 cursor-pointer'>
                                             <BiSolidEditAlt />
                                         </button>
                                         <button onClick={() => handleDelete(record.id)} className='hover:opacity-80 cursor-pointer'>

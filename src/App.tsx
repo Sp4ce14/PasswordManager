@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import Nav from './components/Nav.tsx'
 import Footer from './components/Footer.tsx'
 import Form from './components/Form.tsx'
@@ -23,17 +23,15 @@ function App() {
   ];
   const [Records, setRecords] = useState<Record[]>(mockRecords);
   const [editPressed, setEditPressed] = useState<boolean>(false);
-  const toEditIdRef: React.RefObject<string | null> = useRef<string | null>(null)
+  const [toEditId, setToEditId] = useState<string | null>(null)
 
-  const toggleEdit = (id: string): void => {
-    setEditPressed(prev => !prev);
-    if (editPressed) {
-      toEditIdRef.current = id;
+  const triggerEdit = (id: string): void => {
+    if (!editPressed) {
+      setEditPressed(true);
     }
-    else {
-      toEditIdRef.current = null;
-    }
-  }
+  setToEditId(id);
+  console.log(toEditId)
+};
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -45,9 +43,9 @@ function App() {
           <div className="text-green-600">&lt;</div><div>Pass</div><div className="text-green-600">OP/&gt;</div>
         </div>
         <div className="mb-4 text-[13px] justify-self-center text-gray-700">Your own Password Manager</div>
-        <Form setRecords={setRecords} records={Records} toEditId={toEditIdRef.current}/>
+        <Form setRecords={setRecords} records={Records} toEditId={toEditId} editPressed={editPressed} setEditPressed={setEditPressed}/>
         <div className="font-bold text-2xl mt-10 mb-6">Your Passwords</div>
-        <Table records={Records} setRecords={setRecords} toggleEdit={toggleEdit}/>
+        <Table records={Records} setRecords={setRecords} triggerEdit={triggerEdit}/>
       </main>
       <footer>
         <Footer />
