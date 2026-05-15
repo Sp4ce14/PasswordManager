@@ -5,6 +5,7 @@ import { FaRegSave } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
 import type Record from '../models/record.ts'
+import { toast } from "react-toastify";
 
 interface RecordForm {
   site: string;
@@ -20,48 +21,63 @@ interface FormProps {
   toEditId: string | null;
 }
 
-  const Form: React.FC<FormProps> = ({ setRecords, records, toEditId, editPressed, setEditPressed }: FormProps) => {
+const Form: React.FC<FormProps> = ({ setRecords, records, toEditId, editPressed, setEditPressed }: FormProps) => {
   const [show, setShow] = useState<boolean>(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<RecordForm>();
   const urlRegex: RegExp = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/;
 
   // submit logic
-  const onSubmit = (formData: RecordForm) => {
+  const onSubmit = async (formData: RecordForm) => {
     formData.site = formData.site.trim();
     formData.username = formData.username.trim();
     formData.password = formData.password.trim();
     // add logic
     if (!editPressed) {
-      setRecords(prev => [...prev, {
-      id: crypto.randomUUID(),
-      site: formData.site,
-      username: formData.username,
-      password: formData.password
-    }]);
+      const added = (async () => {
+        const res = await fetch("http://localhost:3000/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData)
+        });
 
-    // update logic
+        if (!res.ok) throw new Error("Request failed");
+
+        const data = await res.json();
+        setRecords(prev => [...prev, data]);
+
+        return data;
+      })();
+
+      toast.promise(added, {
+        pending: "Adding Record",
+        success: "Record Added!",
+        error: "Couldn't Add Record, Please Try Again!"
+      });
+
+      // update logic
     } else {
-      let recordToEdit: Record = records.filter(record => record.id === toEditId)[0]
-      if (!recordToEdit){
+      let recordToEdit: Record = records.filter(record => record._id === toEditId)[0]
+      if (!recordToEdit) {
         alert('The record you are trying to edit has been deleted');
       } else {
         setRecords(prev => {
-        return prev.map(record => record.id === toEditId ? {...record, ...formData}: record);
-      })}
+          return prev.map(record => record._id === toEditId ? { ...record, ...formData } : record);
+        })
+      }
       setEditPressed(false);
     }
     reset({
-        site: '',
-        username: '',
-        password: ''
-      });
+      site: '',
+      username: '',
+      password: ''
+    });
   }
 
   // prefill form logic on edit press
   useEffect(() => {
     // set if condition to escape the initial render and value initialization
     if (editPressed) {
-      let prefillRecord: Record = records.filter(record => record.id == toEditId)[0];
+      let prefillRecord: Record = records.filter(record => record._id == toEditId)[0];
       console.log(prefillRecord, toEditId)
       reset({
         site: prefillRecord.site,
@@ -70,7 +86,7 @@ interface FormProps {
       })
     }
   }, [toEditId, editPressed])
-  
+
 
   return (
     <>
@@ -98,15 +114,17 @@ interface FormProps {
         </div>
         <div className="flex justify-center gap-x-3">
           {editPressed && (
-            <button type="submit" className="mt-2 bg-red-100 border-red-300 border rounded-3xl py-2 px-4 font-semibold hover:opacity-90 cursor-pointer" onClick={() => { setEditPressed(false); reset({
-        site: '',
-        username: '',
-        password: ''
-      }) }}>
-            <div className="flex gap-2 items-center">
-              <div className="text-[25px]"><MdCancel /></div> <div className="text-sm">Cancel</div>
-            </div>
-          </button>
+            <button type="submit" className="mt-2 bg-red-100 border-red-300 border rounded-3xl py-2 px-4 font-semibold hover:opacity-90 cursor-pointer" onClick={() => {
+              setEditPressed(false); reset({
+                site: '',
+                username: '',
+                password: ''
+              })
+            }}>
+              <div className="flex gap-2 items-center">
+                <div className="text-[25px]"><MdCancel /></div> <div className="text-sm">Cancel</div>
+              </div>
+            </button>
           )}
           <button type="submit" className="mt-2 bg-green-400 border-green-600 border rounded-3xl py-2 px-6 font-semibold hover:opacity-90 cursor-pointer">
             <div className="flex gap-2 items-center">

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Nav from './components/Nav.tsx'
 import Footer from './components/Footer.tsx'
 import Form from './components/Form.tsx'
@@ -8,23 +8,23 @@ import type Record from './models/record.ts'
 
 function App() {
 
-  const mockRecords: Record[] = [
-    {
-      id: '1',
-      site: "https://facebook.com",
-      username: "ahmed123",
-      password: "fbpass123",
-    },
-    {
-      id: '2',
-      site: "https://twitter.com",
-      username: "sp4ce14",
-      password: "twitStrongPass!",
-    }
-  ];
-  const [Records, setRecords] = useState<Record[]>(mockRecords);
+  const [Records, setRecords] = useState<Record[]>([]);
   const [editPressed, setEditPressed] = useState<boolean>(false);
   const [toEditId, setToEditId] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchRecords(): Promise<void> {
+    try {
+      let res = await fetch('http://localhost:3000/');
+      let data = await res.json()
+      setRecords(data);
+      console.log(data)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  fetchRecords()
+  }, [])
 
   const triggerEdit = (id: string): void => {
     if (!editPressed) {

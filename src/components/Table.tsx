@@ -16,7 +16,7 @@ const Table: React.FC<TableProps> = ({ records, setRecords, triggerEdit }: Table
 
     // delete logic
     const handleDelete = (id: string): void => {
-        setRecords(prev => prev.filter(record => record.id != id));
+        setRecords(prev => prev.filter(record => record._id != id));
     }
 
     const handleCopy = async (text: string): Promise<void> => {
@@ -42,16 +42,16 @@ const Table: React.FC<TableProps> = ({ records, setRecords, triggerEdit }: Table
                     </thead>
                     <tbody>
                         {records.map(record => (
-                            <tr className='text-sm font-semibold bg-green-100' key={record.id}>
+                            <tr className='text-sm font-semibold bg-green-100' key={record._id}>
                                 <td className='md:w-1/2 py-1.5'><div className="flex justify-center items-center gap-x-0.5"><a href={record.site}>{record.site}</a><button className="cursor-pointer hover:opacity-70" onClick={() => handleCopy(record.site)}><FaCopy /></button></div></td>
                                 <td className='py-3 border-x md:border-0'><div className="flex justify-center items-center gap-x-0.5">{record.username} <button className="cursor-pointer hover:opacity-70" onClick={() => handleCopy(record.username)}><FaCopy /></button></div></td>
                                 <td className='py-3 border-x md:border-0'><div className="flex justify-center items-center gap-x-0.5">{record.password} <button className="cursor-pointer hover:opacity-70" onClick={() => handleCopy(record.password)}><FaCopy /></button></div></td>
                                 <td className='py-3'>
                                     <div className="flex text-2xl gap-2 justify-center">
-                                        <button onClick={() => triggerEdit(record.id)} className='hover:opacity-80 cursor-pointer'>
+                                        <button onClick={() => triggerEdit(record._id)} className='hover:opacity-80 cursor-pointer'>
                                             <BiSolidEditAlt />
                                         </button>
-                                        <button onClick={() => handleDelete(record.id)} className='hover:opacity-80 cursor-pointer'>
+                                        <button onClick={() => handleDelete(record._id)} className='hover:opacity-80 cursor-pointer'>
                                             <MdDelete />
                                         </button>
                                     </div>
