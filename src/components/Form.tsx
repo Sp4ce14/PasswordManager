@@ -20,13 +20,16 @@ interface FormProps {
   toEditId: string | null;
 }
 
-const Form: React.FC<FormProps> = ({ setRecords, records, toEditId, editPressed, setEditPressed }: FormProps) => {
+  const Form: React.FC<FormProps> = ({ setRecords, records, toEditId, editPressed, setEditPressed }: FormProps) => {
   const [show, setShow] = useState<boolean>(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<RecordForm>();
   const urlRegex: RegExp = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/;
 
   // submit logic
   const onSubmit = (formData: RecordForm) => {
+    formData.site = formData.site.trim();
+    formData.username = formData.username.trim();
+    formData.password = formData.password.trim();
     // add logic
     if (!editPressed) {
       setRecords(prev => [...prev, {
@@ -35,6 +38,7 @@ const Form: React.FC<FormProps> = ({ setRecords, records, toEditId, editPressed,
       username: formData.username,
       password: formData.password
     }]);
+
     // update logic
     } else {
       let recordToEdit: Record = records.filter(record => record.id === toEditId)[0]
