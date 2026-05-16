@@ -15,7 +15,7 @@ function App() {
   useEffect(() => {
     async function fetchRecords(): Promise<void> {
     try {
-      let res = await fetch('http://localhost:3000/');
+      let res = await fetch('http://localhost:3000/records');
       let data = await res.json()
       setRecords(data);
       console.log(data)

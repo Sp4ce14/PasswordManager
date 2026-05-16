@@ -33,8 +33,8 @@ const Form: React.FC<FormProps> = ({ setRecords, records, toEditId, editPressed,
     formData.password = formData.password.trim();
     // add logic
     if (!editPressed) {
-      const added = (async () => {
-        const res = await fetch("http://localhost:3000/", {
+      const added: Promise<Record> = (async () => {
+        const res: Response = await fetch("http://localhost:3000/records", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData)
@@ -42,7 +42,7 @@ const Form: React.FC<FormProps> = ({ setRecords, records, toEditId, editPressed,
 
         if (!res.ok) throw new Error("Request failed");
 
-        const data = await res.json();
+        const data: Record = await res.json();
         setRecords(prev => [...prev, data]);
 
         return data;
@@ -60,9 +60,28 @@ const Form: React.FC<FormProps> = ({ setRecords, records, toEditId, editPressed,
       if (!recordToEdit) {
         alert('The record you are trying to edit has been deleted');
       } else {
+        const edited: Promise<any> = (async () => {
+        const res: Response = await fetch(`http://localhost:3000/records/${toEditId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData)
+        });
+
+        if (!res.ok) throw new Error("Request failed");
+
+        const data = await res.json();
         setRecords(prev => {
           return prev.map(record => record._id === toEditId ? { ...record, ...formData } : record);
         })
+
+        return data;
+      })();
+
+      toast.promise(edited, {
+        pending: "Updating Record",
+        success: "Record Updated!",
+        error: "Couldn't Update Record, Please Try Again!"
+      });
       }
       setEditPressed(false);
     }

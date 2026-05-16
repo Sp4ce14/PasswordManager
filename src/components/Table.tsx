@@ -16,7 +16,24 @@ const Table: React.FC<TableProps> = ({ records, setRecords, triggerEdit }: Table
 
     // delete logic
     const handleDelete = (id: string): void => {
-        setRecords(prev => prev.filter(record => record._id != id));
+        const deleted: Promise<any> = (async () => {
+            const res: Response = await fetch(`http://localhost:3000/records/${id}`, {
+                method: "DELETE"
+            });
+
+            if (!res.ok) throw new Error("Request failed");
+
+            const data = await res.json();
+            setRecords(prev => prev.filter(record => record._id != id));
+
+            return data.message;
+        })();
+
+        toast.promise(deleted, {
+            pending: "Deleting Record",
+            success: "Record Deleted!",
+            error: "Couldn't Delete Record, Please Try Again!"
+        });
     }
 
     const handleCopy = async (text: string): Promise<void> => {
